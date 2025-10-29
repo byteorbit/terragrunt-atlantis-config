@@ -422,6 +422,7 @@ func createProject(ctx context.Context, l terragruntlog.Logger, sourcePath strin
 	// We are going to use the same name for both workspace & project name as it is unique.
 	regex := regexp.MustCompile(`[^a-zA-Z0-9_-]+`)
 	projectName := regex.ReplaceAllString(project.Dir, "_")
+	// TODO add option to prune the .terragrunt-stack directories from project name
 
 	if createProjectName {
 		project.Name = projectName

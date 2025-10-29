@@ -105,6 +105,13 @@ func parseLocals(ctx *config.ParsingContext, l terragruntlog.Logger, path string
 		return ResolvedLocals{}, err
 	}
 
+	unitValues, err := config.ReadValues(ctx.Context, l, ctx.TerragruntOptions, filepath.Dir(file.ConfigPath))
+	if err != nil {
+		return ResolvedLocals{}, err
+	}
+
+	ctx = ctx.WithValues(unitValues)
+
 	// Decode just the Base blocks. See the function docs for DecodeBaseBlocks for more info on what base blocks are.
 	baseBlocks, err := config.DecodeBaseBlocks(ctx, l, file, includeFromChild)
 	if err != nil {
