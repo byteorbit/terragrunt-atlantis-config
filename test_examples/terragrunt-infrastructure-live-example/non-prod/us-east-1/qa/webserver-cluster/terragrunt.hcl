@@ -18,13 +18,13 @@ terraform {
 # Include the root `terragrunt.hcl` configuration. The root configuration contains settings that are common across all
 # components and environments, such as how to configure remote state.
 include "root" {
-  path = find_in_parent_folders()
+  path = find_in_parent_folders("root.hcl")
 }
 
 # Include the envcommon configuration for the component. The envcommon configuration contains settings that are common
 # for the component across all environments.
 include "envcommon" {
-  path   = "${dirname(find_in_parent_folders())}/_envcommon/webserver-cluster.hcl"
+  path   = format("%s/_envcommon/webserver-cluster.hcl", dirname(find_in_parent_folders("root.hcl")))
   expose = true
 }
 

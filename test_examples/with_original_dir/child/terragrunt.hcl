@@ -1,10 +1,10 @@
 include "root" {
-  path   = find_in_parent_folders()
+  path   = find_in_parent_folders("root.hcl")
   expose = true
 }
 
 include "common_configs" {
-  path   = "${dirname(find_in_parent_folders())}/common/terragrunt.hcl"
+  path   = format("%s/common/terragrunt.hcl", dirname(find_in_parent_folders("root.hcl")))
   expose = true
 }
 

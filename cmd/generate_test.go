@@ -52,15 +52,32 @@ func resetForRun() error {
 
 // Runs a test, asserting the output produced matches a golden file
 func runTest(t *testing.T, goldenFile string, args []string) {
-	err := resetForRun()
-	if err != nil {
+	if err := resetForRun(); err != nil {
 		t.Error("Failed to reset default flags")
 		return
 	}
 
+	content, err := generateAtlantisConfig(args)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	goldenContents, err := loadGoldenFile(goldenFile)
+	if err != nil {
+		t.Errorf("Failed to read golden file: %v", err)
+		return
+	}
+
+	assert.Equal(t, goldenContents, content)
+}
+
+func generateAtlantisConfig(args []string) (*AtlantisConfig, error) {
 	randomInt := rand.Int()
 	filename := filepath.Join("test_artifacts", fmt.Sprintf("%d.yaml", randomInt))
-	defer os.Remove(filename)
+	defer func(name string) {
+		_ = os.Remove(name)
+	}(filename)
 
 	allArgs := append([]string{
 		"generate",
@@ -69,22 +86,55 @@ func runTest(t *testing.T, goldenFile string, args []string) {
 	}, args...)
 
 	contentBytes, err := RunWithFlags(filename, allArgs)
+	if err != nil {
+		return nil, err
+	}
+
 	content := &AtlantisConfig{}
-	yaml.Unmarshal(contentBytes, content)
-	if err != nil {
-		t.Error(err)
-		return
+	if err = yaml.Unmarshal(contentBytes, content); err != nil {
+		return nil, fmt.Errorf("unmarshal generated content: %w", err)
 	}
 
+	return content, nil
+}
+
+func loadGoldenFile(goldenFile string) (*AtlantisConfig, error) {
 	goldenContentsBytes, err := os.ReadFile(goldenFile)
-	goldenContents := &AtlantisConfig{}
-	yaml.Unmarshal(goldenContentsBytes, goldenContents)
 	if err != nil {
-		t.Error("Failed to read golden file")
-		return
+		return nil, fmt.Errorf("read golden file %s: %w", goldenFile, err)
 	}
 
-	assert.Equal(t, goldenContents, content)
+	goldenContents := &AtlantisConfig{}
+	if err = yaml.Unmarshal(goldenContentsBytes, goldenContents); err != nil {
+		return nil, fmt.Errorf("unmarshal golden file %s: %w", goldenFile, err)
+	}
+
+	return goldenContents, nil
+}
+
+func runStackTest(t *testing.T, rootPath string, goldenFile string, args []string) {
+	// TODO generate stack here in the root path
+	//allArgs := append([]string{
+	//	"stack",
+	//	"generate",
+	//})
+	//# TODO
+	//opts := options.NewTerragruntOptions()
+	//l := log.New(
+	//	log.WithOutput(os.Stderr),
+	//	log.WithLevel(log.DebugLevel),
+	//	log.WithFormatter(format.NewFormatter(format.NewPrettyFormatPlaceholders())),
+	//)
+	//RunGenerate()
+	//
+	//contentBytes, err := RunWithFlags(filename, allArgs)
+	//if err != nil {
+	//	return nil, err
+	//}
+
+	//tg_helpers.RunTerragrunt(t, "terragrunt stack generate --working-dir "+rootPath)
+
+	runTest(t, goldenFile, args)
 }
 
 func TestSettingRoot(t *testing.T) {
@@ -181,7 +231,7 @@ func TestNonStringErrorOnExtraDeclaredDependencies(t *testing.T) {
 		filepath.Join("..", "test_examples_errors", "extra_dependency_error"),
 	})
 	err = rootCmd.Execute()
-	
+
 	expectedError := "extra_atlantis_dependencies contains non-string value at position 4"
 	if err == nil || err.Error() != expectedError {
 		t.Errorf("Expected error '%s', got '%v'", expectedError, err)
@@ -621,6 +671,7 @@ func TestEnvHCLProjectsSubChilds(t *testing.T) {
 }
 
 func TestEnvHCLProjectsExternalChilds(t *testing.T) {
+	//t.Skip("skipping excessive catch all test")
 	runTest(t, filepath.Join("golden", "envhcl_externalchilds.yaml"), []string{
 		"--root",
 		filepath.Join("..", "test_examples"),
@@ -631,6 +682,8 @@ func TestEnvHCLProjectsExternalChilds(t *testing.T) {
 }
 
 func TestEnvHCLProjectsAllChilds(t *testing.T) {
+	//t.Skip("skipping excessive catch all test")
+
 	runTest(t, filepath.Join("golden", "envhcl_allchilds.yaml"), []string{
 		"--root",
 		filepath.Join("..", "test_examples"),
@@ -682,3 +735,23 @@ func TestWithDependsOn(t *testing.T) {
 		"--create-project-name",
 	})
 }
+
+func TestTerragruntStackBasic(t *testing.T) {
+	rootPath := filepath.Join("..", "test_examples", "terragrunt_stack", "basic")
+	runStackTest(t, rootPath, filepath.Join("golden", "terragrunt_stack_basic.yaml"), []string{
+		"--root",
+		rootPath,
+		"--depends-on",
+		"--create-project-name",
+	})
+}
+
+//func TestTerragruntStackInternalDependency(t *testing.T) {
+//	rootPath := filepath.Join("..", "test_examples", "terragrunt_stack", "internal-dependency")
+//	runStackTest(t, rootPath, filepath.Join("golden", "terragrunt_stack_basic.yaml"), []string{
+//		"--root",
+//		rootPath,
+//		"--depends-on",
+//		"--create-project-name",
+//	})
+//}

@@ -7,7 +7,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
     - ../network/terragrunt.hcl
     - ../../stage/network/terragrunt.hcl
   dir: myproject/eu-south-1/infra/apps
@@ -16,7 +16,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
     - ../../stage/network/terragrunt.hcl
   dir: myproject/eu-south-1/infra/network
 - autoplan:
@@ -24,7 +24,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
     - ../network/terragrunt.hcl
   dir: myproject/eu-south-1/stage/dbs
 - autoplan:
@@ -32,20 +32,20 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
   dir: myproject/eu-south-1/stage/network
 - autoplan:
     enabled: true
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../terragrunt.hcl
+    - ../../../root.hcl
   dir: myproject/global/dns
 - autoplan:
     enabled: true
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../terragrunt.hcl
+    - ../../../root.hcl
   dir: myproject/global/iam
 version: 3

@@ -7,20 +7,20 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
   dir: autoplan_false
 - autoplan:
     enabled: true
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
   dir: autoplan_true
 - autoplan:
     enabled: true
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
   dir: set_in_parent
 version: 3

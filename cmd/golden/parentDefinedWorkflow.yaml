@@ -7,7 +7,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
   dir: child
   workflow: workflowSpecifiedInParent
 version: 3

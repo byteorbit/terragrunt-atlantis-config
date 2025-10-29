@@ -7,6 +7,6 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../terragrunt.hcl
+    - ../../root.hcl
   dir: child/deep
 version: 3

@@ -7,7 +7,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
   dir: inherit_from_parent
   terraform_version: 0.12.9001
 - autoplan:
@@ -15,7 +15,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
   dir: override_parent
   terraform_version: 0.13.9001
 - autoplan:

@@ -9,7 +9,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
   dir: apply_requirements_overrides/child_that_does_not_override
 - apply_requirements:
   - mergeable
@@ -18,7 +18,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
   dir: apply_requirements_overrides/child_that_overrides
 - apply_requirements: []
   autoplan:
@@ -26,7 +26,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
   dir: apply_requirements_overrides/child_that_overrides_to_empty
 - autoplan:
     enabled: false
@@ -54,21 +54,21 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
   dir: autoplan/autoplan_false
 - autoplan:
     enabled: true
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
   dir: autoplan/autoplan_true
 - autoplan:
     enabled: true
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
   dir: autoplan/set_in_parent
 - autoplan:
     enabled: false
@@ -110,7 +110,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
   dir: child_and_parent_specify_workflow/child
   workflow: workflowSpecifiedInChild
 - autoplan:
@@ -138,7 +138,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
     - ../terraform.tfvars
     - ../dev.tfvars
     - ../us-east-1.tfvars
@@ -150,14 +150,14 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
   dir: extra_arguments/no_files_at_all
 - autoplan:
     enabled: false
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
     - ../dev.tfvars
     - ../us-east-1.tfvars
     - dev.tfvars
@@ -168,7 +168,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
     - ../terraform.tfvars
   dir: extra_arguments/only_required_files
 - autoplan:
@@ -176,7 +176,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
     - ../../../../common_vars/apps/consul/sg.tfvars
     - main.tfvars
   dir: extra_arguments/var_file
@@ -193,7 +193,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
     - ../someRandomDir/terragrunt.hcl
   dir: hcl_json/json_expanded
   workflow: terragruntjson  
@@ -204,21 +204,21 @@ projects:
     - '*.tf*'
     - '**/*.hcl'
     - '**/*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
   dir: invalid_parent_module/child
 - autoplan:
     enabled: false
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../terragrunt.hcl
+    - ../../root.hcl
   dir: invalid_parent_module/child/deep
 - autoplan:
     enabled: false
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
     - ../root-module/*.tf*
     - ../terraform-module/*.tf*
   dir: local_terraform_abs_module_source/terragrunt-module
@@ -235,7 +235,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
     - ../terraform-another-module/*.tf*
     - ../terraform-module/*.tf*
     - ../terraform-module/nested-module/*.tf*
@@ -247,14 +247,14 @@ projects:
     - '*.tf*'
     - '**/*.hcl'
     - '**/*.tf*'
-    - ../../../terragrunt.hcl
+    - ../../../root.hcl
   dir: multi_accounts_vpc_route53_tgw/network-account/eu-west-1/network
 - autoplan:
     enabled: false
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
   dir: multi_accounts_vpc_route53_tgw/network-account/eu-west-1/network/transit-gateway
 - autoplan:
     enabled: false
@@ -263,7 +263,7 @@ projects:
     - '*.tf*'
     - '**/*.hcl'
     - '**/*.tf*'
-    - ../../../terragrunt.hcl
+    - ../../../root.hcl
     - ../env-a/network/vpc/terragrunt.hcl
     - ../../../network-account/eu-west-1/network/transit-gateway/terragrunt.hcl
   dir: multi_accounts_vpc_route53_tgw/prod/eu-west-1/_global
@@ -272,7 +272,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../../terragrunt.hcl
+    - ../../../../../root.hcl
     - ../../../env-a/network/vpc/terragrunt.hcl
     - ../../../../../network-account/eu-west-1/network/transit-gateway/terragrunt.hcl
   dir: multi_accounts_vpc_route53_tgw/prod/eu-west-1/_global/route53/test-zone
@@ -283,7 +283,7 @@ projects:
     - '*.tf*'
     - '**/*.hcl'
     - '**/*.tf*'
-    - ../../../terragrunt.hcl
+    - ../../../root.hcl
     - ../../../network-account/eu-west-1/network/transit-gateway/terragrunt.hcl
   dir: multi_accounts_vpc_route53_tgw/prod/eu-west-1/env-a
 - autoplan:
@@ -291,7 +291,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../../terragrunt.hcl
+    - ../../../../../root.hcl
     - ../../../../../network-account/eu-west-1/network/transit-gateway/terragrunt.hcl
   dir: multi_accounts_vpc_route53_tgw/prod/eu-west-1/env-a/network/vpc
 - autoplan:
@@ -335,7 +335,7 @@ projects:
     - '*.tf*'
     - '**/*.hcl'
     - '**/*.tf*'
-    - ../../../terragrunt.hcl
+    - ../../../root.hcl
     - ../stage/network/terragrunt.hcl
   dir: no_terraform_blocks/myproject/eu-south-1/infra
 - autoplan:
@@ -343,7 +343,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
     - ../network/terragrunt.hcl
     - ../../stage/network/terragrunt.hcl
   dir: no_terraform_blocks/myproject/eu-south-1/infra/apps
@@ -352,7 +352,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
     - ../../stage/network/terragrunt.hcl
   dir: no_terraform_blocks/myproject/eu-south-1/infra/network
 - autoplan:
@@ -362,14 +362,14 @@ projects:
     - '*.tf*'
     - '**/*.hcl'
     - '**/*.tf*'
-    - ../../../terragrunt.hcl
+    - ../../../root.hcl
   dir: no_terraform_blocks/myproject/eu-south-1/stage
 - autoplan:
     enabled: false
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
     - ../network/terragrunt.hcl
   dir: no_terraform_blocks/myproject/eu-south-1/stage/dbs
 - autoplan:
@@ -377,7 +377,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
   dir: no_terraform_blocks/myproject/eu-south-1/stage/network
 - autoplan:
     enabled: false
@@ -386,21 +386,21 @@ projects:
     - '*.tf*'
     - '**/*.hcl'
     - '**/*.tf*'
-    - ../../terragrunt.hcl
+    - ../../root.hcl
   dir: no_terraform_blocks/myproject/global
 - autoplan:
     enabled: false
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../terragrunt.hcl
+    - ../../../root.hcl
   dir: no_terraform_blocks/myproject/global/dns
 - autoplan:
     enabled: false
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../terragrunt.hcl
+    - ../../../root.hcl
   dir: no_terraform_blocks/myproject/global/iam
 - autoplan:
     enabled: false
@@ -430,7 +430,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
   dir: parent_with_workflow_local/child
   workflow: workflowSpecifiedInParent
 - autoplan:
@@ -440,7 +440,7 @@ projects:
     - '*.tf*'
     - '**/*.hcl'
     - '**/*.tf*'
-    - ../../../terragrunt.hcl
+    - ../../../root.hcl
     - ../../account.hcl
     - ../region.hcl
     - ../../arbitrary.hcl
@@ -452,7 +452,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
     - ../../../account.hcl
     - ../../region.hcl
     - ../env.hcl
@@ -462,7 +462,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
     - ../../../account.hcl
     - ../../region.hcl
     - ../env.hcl
@@ -474,7 +474,7 @@ projects:
     - '*.tf*'
     - '**/*.hcl'
     - '**/*.tf*'
-    - ../../../terragrunt.hcl
+    - ../../../root.hcl
     - ../../account.hcl
     - ../region.hcl
   dir: project_hcl_with_atlantis_locals/non-prod/us-east-1/stage
@@ -484,7 +484,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
     - ../../../account.hcl
     - ../../region.hcl
     - ../env.hcl
@@ -494,7 +494,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
     - ../../../account.hcl
     - ../../region.hcl
     - ../env.hcl
@@ -506,7 +506,7 @@ projects:
     - '*.tf*'
     - '**/*.hcl'
     - '**/*.tf*'
-    - ../../../terragrunt.hcl
+    - ../../../root.hcl
     - ../../account.hcl
     - ../region.hcl
     - ../../arbitrary.hcl
@@ -518,7 +518,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
     - ../../../account.hcl
     - ../../region.hcl
     - ../env.hcl
@@ -528,7 +528,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
     - ../../../account.hcl
     - ../../region.hcl
     - ../env.hcl
@@ -540,7 +540,7 @@ projects:
     - '*.tf*'
     - '**/*.hcl'
     - '**/*.tf*'
-    - ../../../terragrunt.hcl
+    - ../../../root.hcl
     - ../../account.hcl
     - ../region.hcl
   dir: project_hcl_with_project_marker/non-prod/us-east-1/stage
@@ -550,7 +550,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
     - ../../../account.hcl
     - ../../region.hcl
     - ../env.hcl
@@ -560,7 +560,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
     - ../../../account.hcl
     - ../../region.hcl
     - ../env.hcl
@@ -642,14 +642,14 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
   dir: skip/skip_false
 - autoplan:
     enabled: false
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
   dir: terraform_version/inherit_from_parent
   terraform_version: 0.12.9001
 - autoplan:
@@ -657,7 +657,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
   dir: terraform_version/override_parent
   terraform_version: 0.13.9001
 - autoplan:
@@ -673,7 +673,7 @@ projects:
     - '*.tf*'
     - '**/*.hcl'
     - '**/*.tf*'
-    - ../../../terragrunt.hcl
+    - ../../../root.hcl
     - ../../../_envcommon/mysql.hcl
     - ../../account.hcl
     - ../region.hcl
@@ -684,7 +684,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
     - ../../../../_envcommon/mysql.hcl
     - ../../../account.hcl
     - ../../region.hcl
@@ -695,7 +695,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
     - ../../../../_envcommon/webserver-cluster.hcl
     - ../../../account.hcl
     - ../../region.hcl
@@ -708,7 +708,7 @@ projects:
     - '*.tf*'
     - '**/*.hcl'
     - '**/*.tf*'
-    - ../../../terragrunt.hcl
+    - ../../../root.hcl
     - ../../../_envcommon/mysql.hcl
     - ../../account.hcl
     - ../region.hcl
@@ -719,7 +719,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
     - ../../../../_envcommon/mysql.hcl
     - ../../../account.hcl
     - ../../region.hcl
@@ -730,7 +730,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
     - ../../../../_envcommon/webserver-cluster.hcl
     - ../../../account.hcl
     - ../../region.hcl
@@ -743,7 +743,7 @@ projects:
     - '*.tf*'
     - '**/*.hcl'
     - '**/*.tf*'
-    - ../../../terragrunt.hcl
+    - ../../../root.hcl
     - ../../../_envcommon/mysql.hcl
     - ../../account.hcl
     - ../region.hcl
@@ -754,7 +754,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
     - ../../../../_envcommon/mysql.hcl
     - ../../../account.hcl
     - ../../region.hcl
@@ -765,7 +765,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../../../../terragrunt.hcl
+    - ../../../../root.hcl
     - ../../../../_envcommon/webserver-cluster.hcl
     - ../../../account.hcl
     - ../../region.hcl
@@ -789,7 +789,7 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
     - ../common/terragrunt.hcl
     - ../dependency/terragrunt.hcl
   dir: with_original_dir/child
@@ -798,13 +798,13 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
   dir: with_original_dir/dependency
 - autoplan:
     enabled: false
     when_modified:
     - '*.hcl'
     - '*.tf*'
-    - ../terragrunt.hcl
+    - ../root.hcl
   dir: with_parent/child
 version: 3
