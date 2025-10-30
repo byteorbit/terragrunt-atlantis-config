@@ -682,3 +682,25 @@ func TestWithDependsOn(t *testing.T) {
 		"--create-project-name",
 	})
 }
+
+func TestTerragruntStackBasic(t *testing.T) {
+	runTest(t, filepath.Join("golden", "terragrunt_stack_basic.yaml"), []string{
+		"--root",
+		filepath.Join("..", "test_examples", "terragrunt_stack", "basic"),
+		"--depends-on",
+		"--create-project-name",
+		"--strip-dot-terragrunt-stack-name",
+	})
+}
+
+func TestTerragruntStackInternalDependency(t *testing.T) {
+	runTest(t, filepath.Join("golden", "terragrunt_stack_internal_dependency.yaml"), []string{
+		"--root",
+		filepath.Join("..", "test_examples", "terragrunt_stack", "internal-dependency"),
+		"--depends-on",
+		"--create-project-name",
+		"--strip-dot-terragrunt-stack-name",
+		"--execution-order-groups",
+		"--depends-on",
+	})
+}
