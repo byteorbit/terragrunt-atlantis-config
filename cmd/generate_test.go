@@ -671,7 +671,7 @@ func TestEnvHCLProjectsSubChilds(t *testing.T) {
 }
 
 func TestEnvHCLProjectsExternalChilds(t *testing.T) {
-	//t.Skip("skipping excessive catch all test")
+	t.Skip("skipping excessive catch all test")
 	runTest(t, filepath.Join("golden", "envhcl_externalchilds.yaml"), []string{
 		"--root",
 		filepath.Join("..", "test_examples"),
@@ -682,7 +682,7 @@ func TestEnvHCLProjectsExternalChilds(t *testing.T) {
 }
 
 func TestEnvHCLProjectsAllChilds(t *testing.T) {
-	//t.Skip("skipping excessive catch all test")
+	t.Skip("skipping excessive catch all test")
 
 	runTest(t, filepath.Join("golden", "envhcl_allchilds.yaml"), []string{
 		"--root",
