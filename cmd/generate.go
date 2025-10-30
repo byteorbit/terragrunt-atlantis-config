@@ -1,9 +1,10 @@
 package cmd
 
 import (
-	"github.com/gruntwork-io/terragrunt/util"
 	"regexp"
 	"sort"
+
+	"github.com/gruntwork-io/terragrunt/util"
 
 	"github.com/hashicorp/go-getter"
 	log "github.com/sirupsen/logrus"
@@ -419,6 +420,10 @@ func createProject(ctx context.Context, sourcePath string) (*AtlantisProject, er
 	// We are going to use the same name for both workspace & project name as it is unique.
 	regex := regexp.MustCompile(`[^a-zA-Z0-9_-]+`)
 	projectName := regex.ReplaceAllString(project.Dir, "_")
+
+	if stripDotTerragruntStackName {
+		projectName = strings.ReplaceAll(projectName, "_terragrunt-stack", "")
+	}
 
 	if createProjectName {
 		project.Name = projectName
@@ -870,6 +875,7 @@ func main(cmd *cobra.Command, args []string) error {
 			hasChanges = false
 			for _, project := range config.Projects {
 				executionOrderGroup := 0
+				//seen := make(map[string]bool)
 				dependsOnList := []string{}
 				// choose order group based on dependencies
 				for _, dep := range project.Autoplan.WhenModified {
@@ -889,7 +895,11 @@ func main(cmd *cobra.Command, args []string) error {
 							executionOrderGroup = *depProject.ExecutionOrderGroup + 1
 						}
 					}
+					//projName := depProject.Name
+					//if _, ok := seen[projName]; !ok {
+					//	seen[projName] = true
 					dependsOnList = append(dependsOnList, depProject.Name)
+					//}
 				}
 				if projectsMap[project.Dir].ExecutionOrderGroup == nil || *projectsMap[project.Dir].ExecutionOrderGroup != executionOrderGroup {
 					if executionOrderGroups {
@@ -967,6 +977,7 @@ var createHclProjectExternalChilds bool
 var useProjectMarkers bool
 var executionOrderGroups bool
 var dependsOn bool
+var stripDotTerragruntStackName bool
 
 // generateCmd represents the generate command
 var generateCmd = &cobra.Command{
@@ -1015,6 +1026,7 @@ func init() {
 	generateCmd.PersistentFlags().BoolVar(&useProjectMarkers, "use-project-markers", false, "Creates Atlantis projects only for project hcl files with locals: atlantis_project = true")
 	generateCmd.PersistentFlags().BoolVar(&executionOrderGroups, "execution-order-groups", false, "Computes execution_order_groups for projects")
 	generateCmd.PersistentFlags().BoolVar(&dependsOn, "depends-on", false, "Computes depends_on for projects. Requires --create-project-name.")
+	generateCmd.PersistentFlags().BoolVar(&stripDotTerragruntStackName, "strip-dot-terragrunt-stack-name", false, "Remove the _terragrunt-stack directory names from project names.")
 }
 
 // Runs a set of arguments, returning the output

@@ -566,6 +566,29 @@ projects:
     when_modified:
     - '*.hcl'
     - '*.tf*'
+    - ../../../root.hcl
+  dir: terragrunt_stack/basic/prod/.terragrunt-stack/service
+- autoplan:
+    enabled: false
+    when_modified:
+    - '*.hcl'
+    - '*.tf*'
+    - ../../../root.hcl
+    - ../parent/terragrunt.hcl
+    - ../parent/*.tf*
+  dir: terragrunt_stack/internal-dependency/prod/.terragrunt-stack/child
+- autoplan:
+    enabled: false
+    when_modified:
+    - '*.hcl'
+    - '*.tf*'
+    - ../../../root.hcl
+  dir: terragrunt_stack/internal-dependency/prod/.terragrunt-stack/parent
+- autoplan:
+    enabled: false
+    when_modified:
+    - '*.hcl'
+    - '*.tf*'
     - ../terragrunt.hcl
     - ../common/terragrunt.hcl
     - ../dependency/terragrunt.hcl

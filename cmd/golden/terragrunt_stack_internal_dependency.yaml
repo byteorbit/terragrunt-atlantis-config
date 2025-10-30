@@ -1,0 +1,28 @@
+automerge: false
+parallel_apply: true
+parallel_plan: true
+projects:
+- autoplan:
+    enabled: false
+    when_modified:
+    - '*.hcl'
+    - '*.tf*'
+    - ../../../root.hcl
+  dir: prod/.terragrunt-stack/parent
+  execution_order_group: 0
+  name: prod_parent
+- autoplan:
+    enabled: false
+    when_modified:
+    - '*.hcl'
+    - '*.tf*'
+    - ../../../root.hcl
+    - ../parent/terragrunt.hcl
+    - ../parent/*.tf*
+  depends_on:
+  - prod_parent
+  - prod_parent  # A duplicate is currently created, this should be fixed though trivial fix broke regression.
+  dir: prod/.terragrunt-stack/child
+  execution_order_group: 1
+  name: prod_child
+version: 3

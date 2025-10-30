@@ -6,12 +6,13 @@ package cmd
 
 import (
 	"fmt"
+	"path/filepath"
+
 	"github.com/gruntwork-io/go-commons/errors"
 	"github.com/gruntwork-io/terragrunt/config"
 	"github.com/gruntwork-io/terragrunt/config/hclparse"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/zclconf/go-cty/cty"
-	"path/filepath"
 )
 
 // ResolvedLocals are the parsed result of local values this module cares about
@@ -102,6 +103,13 @@ func parseLocals(ctx *config.ParsingContext, path string, includeFromChild *conf
 	if err != nil {
 		return ResolvedLocals{}, err
 	}
+
+	unitValues, err := config.ReadValues(ctx.Context, ctx.TerragruntOptions, filepath.Dir(file.ConfigPath))
+	if err != nil {
+		return ResolvedLocals{}, err
+	}
+
+	ctx = ctx.WithValues(unitValues)
 
 	// Decode just the Base blocks. See the function docs for DecodeBaseBlocks for more info on what base blocks are.
 	baseBlocks, err := config.DecodeBaseBlocks(ctx, file, includeFromChild)

@@ -181,7 +181,7 @@ func TestNonStringErrorOnExtraDeclaredDependencies(t *testing.T) {
 		filepath.Join("..", "test_examples_errors", "extra_dependency_error"),
 	})
 	err = rootCmd.Execute()
-	
+
 	expectedError := "extra_atlantis_dependencies contains non-string value at position 4"
 	if err == nil || err.Error() != expectedError {
 		t.Errorf("Expected error '%s', got '%v'", expectedError, err)
@@ -680,5 +680,27 @@ func TestWithDependsOn(t *testing.T) {
 		filepath.Join("..", "test_examples", "chained_dependencies"),
 		"--depends-on",
 		"--create-project-name",
+	})
+}
+
+func TestTerragruntStackBasic(t *testing.T) {
+	runTest(t, filepath.Join("golden", "terragrunt_stack_basic.yaml"), []string{
+		"--root",
+		filepath.Join("..", "test_examples", "terragrunt_stack", "basic"),
+		"--depends-on",
+		"--create-project-name",
+		"--strip-dot-terragrunt-stack-name",
+	})
+}
+
+func TestTerragruntStackInternalDependency(t *testing.T) {
+	runTest(t, filepath.Join("golden", "terragrunt_stack_internal_dependency.yaml"), []string{
+		"--root",
+		filepath.Join("..", "test_examples", "terragrunt_stack", "internal-dependency"),
+		"--depends-on",
+		"--create-project-name",
+		"--strip-dot-terragrunt-stack-name",
+		"--execution-order-groups",
+		"--depends-on",
 	})
 }
