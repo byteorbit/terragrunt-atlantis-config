@@ -1,4 +1,4 @@
-package cmd
+package cmd_test
 
 import (
 	"fmt"
@@ -9,57 +9,25 @@ import (
 	"testing"
 
 	"github.com/ghodss/yaml"
+	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/sync/singleflight"
+	"github.com/transcend-io/terragrunt-atlantis-config/cmd"
 )
 
-// Resets all flag values to their defaults in between tests
-func resetForRun() error {
-	pwd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
+// Runs a set of arguments, returning the output
+func RunWithFlags(rootCmd *cobra.Command, filename string, args []string) ([]byte, error) {
+	rootCmd.SetArgs(args)
+	rootCmd.Execute()
 
-	// reset caches
-	getDependenciesCache = newGetDependenciesCache()
-	requestGroup = singleflight.Group{}
-	// reset flags
-	gitRoot = pwd
-	autoPlan = false
-	autoMerge = false
-	cascadeDependencies = true
-	ignoreParentTerragrunt = true
-	ignoreDependencyBlocks = false
-	parallel = true
-	createWorkspace = false
-	createProjectName = false
-	preserveWorkflows = true
-	preserveProjects = true
-	defaultWorkflow = ""
-	filterPaths = []string{}
-	outputPath = ""
-	defaultTerraformVersion = ""
-	defaultApplyRequirements = []string{}
-	projectHclFiles = []string{}
-	createHclProjectChilds = false
-	createHclProjectExternalChilds = true
-	useProjectMarkers = false
-	executionOrderGroups = false
-	dependsOn = false
-
-	return nil
+	return os.ReadFile(filename)
 }
 
 // Runs a test, asserting the output produced matches a golden file
 func runTest(t *testing.T, goldenFile string, args []string) {
-	err := resetForRun()
-	if err != nil {
-		t.Error("Failed to reset default flags")
-		return
-	}
+	rootCmd := cmd.NewRoot()
 
 	randomInt := rand.Int()
-	filename := filepath.Join("test_artifacts", fmt.Sprintf("%d.yaml", randomInt))
+	filename := filepath.Join(t.TempDir(), fmt.Sprintf("%d.yaml", randomInt))
 	defer os.Remove(filename)
 
 	allArgs := append([]string{
@@ -68,8 +36,8 @@ func runTest(t *testing.T, goldenFile string, args []string) {
 		filename,
 	}, args...)
 
-	contentBytes, err := RunWithFlags(filename, allArgs)
-	content := &AtlantisConfig{}
+	contentBytes, err := RunWithFlags(rootCmd, filename, allArgs)
+	content := &cmd.AtlantisConfig{}
 	yaml.Unmarshal(contentBytes, content)
 	if err != nil {
 		t.Error(err)
@@ -77,7 +45,7 @@ func runTest(t *testing.T, goldenFile string, args []string) {
 	}
 
 	goldenContentsBytes, err := os.ReadFile(goldenFile)
-	goldenContents := &AtlantisConfig{}
+	goldenContents := &cmd.AtlantisConfig{}
 	yaml.Unmarshal(goldenContentsBytes, goldenContents)
 	if err != nil {
 		t.Error("Failed to read golden file")
@@ -169,18 +137,13 @@ func TestExtraDeclaredDependencies(t *testing.T) {
 }
 
 func TestNonStringErrorOnExtraDeclaredDependencies(t *testing.T) {
-	err := resetForRun()
-	if err != nil {
-		t.Error("Failed to reset default flags")
-		return
-	}
-
+	rootCmd := cmd.NewRoot()
 	rootCmd.SetArgs([]string{
 		"generate",
 		"--root",
 		filepath.Join("..", "test_examples_errors", "extra_dependency_error"),
 	})
-	err = rootCmd.Execute()
+	err := rootCmd.Execute()
 
 	expectedError := "extra_atlantis_dependencies contains non-string value at position 4"
 	if err == nil || err.Error() != expectedError {
@@ -335,14 +298,10 @@ func TestTerraformVersionConfig(t *testing.T) {
 }
 
 func TestPreservingOldWorkflows(t *testing.T) {
-	err := resetForRun()
-	if err != nil {
-		t.Error("Failed to reset default flags")
-		return
-	}
+	rootCmd := cmd.NewRoot()
 
 	randomInt := rand.Int()
-	filename := filepath.Join("test_artifacts", fmt.Sprintf("%d.yaml", randomInt))
+	filename := filepath.Join(t.TempDir(), fmt.Sprintf("%d.yaml", randomInt))
 	defer os.Remove(filename)
 
 	// Create an existing file to simulate an existing atlantis.yaml file
@@ -357,7 +316,7 @@ func TestPreservingOldWorkflows(t *testing.T) {
 `)
 	os.WriteFile(filename, contents, 0644)
 
-	content, err := RunWithFlags(filename, []string{
+	content, err := RunWithFlags(rootCmd, filename, []string{
 		"generate",
 		"--output",
 		filename,
@@ -381,14 +340,10 @@ func TestPreservingOldWorkflows(t *testing.T) {
 }
 
 func TestPreservingOldProjects(t *testing.T) {
-	err := resetForRun()
-	if err != nil {
-		t.Error("Failed to reset default flags")
-		return
-	}
+	rootCmd := cmd.NewRoot()
 
 	randomInt := rand.Int()
-	filename := filepath.Join("test_artifacts", fmt.Sprintf("%d.yaml", randomInt))
+	filename := filepath.Join(t.TempDir(), fmt.Sprintf("%d.yaml", randomInt))
 	defer os.Remove(filename)
 
 	// Create an existing file to simulate an existing atlantis.yaml file
@@ -403,7 +358,7 @@ func TestPreservingOldProjects(t *testing.T) {
 `)
 	os.WriteFile(filename, contents, 0644)
 
-	content, err := RunWithFlags(filename, []string{
+	content, err := RunWithFlags(rootCmd, filename, []string{
 		"generate",
 		"--preserve-projects",
 		"--output",

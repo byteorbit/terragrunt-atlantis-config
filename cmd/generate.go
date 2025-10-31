@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"regexp"
 	"sort"
 
@@ -80,8 +81,6 @@ func (m *GetDependenciesCache) get(k string) (getDependenciesOutput, bool) {
 	return v, ok
 }
 
-var getDependenciesCache = newGetDependenciesCache()
-
 func uniqueStrings(str []string) []string {
 	keys := make(map[string]bool)
 	list := []string{}
@@ -123,7 +122,7 @@ func sliceUnion(a, b []string) []string {
 }
 
 // Parses the terragrunt config at `path` to find all modules it depends on
-func getDependencies(ctx *config.ParsingContext, path string) ([]string, error) {
+func getDependencies(ctx *config.ParsingContext, path string, getDependenciesCache *GetDependenciesCache) ([]string, error) {
 	res, err, _ := requestGroup.Do(path, func() (interface{}, error) {
 		// Check if this path has already been computed
 		cachedResult, ok := getDependenciesCache.get(path)
@@ -264,7 +263,7 @@ func getDependencies(ctx *config.ParsingContext, path string) ([]string, error) 
 			terrOpts.OriginalTerragruntConfigPath = ctx.TerragruntOptions.OriginalTerragruntConfigPath
 			terrOpts.Env = ctx.TerragruntOptions.Env
 			terrContext := config.NewParsingContext(ctx, terrOpts)
-			childDeps, err := getDependencies(terrContext, depPath)
+			childDeps, err := getDependencies(terrContext, depPath, getDependenciesCache)
 			if err != nil {
 				continue
 			}
@@ -321,7 +320,7 @@ func getDependencies(ctx *config.ParsingContext, path string) ([]string, error) 
 }
 
 // Creates an AtlantisProject for a directory
-func createProject(ctx context.Context, sourcePath string) (*AtlantisProject, error) {
+func createProject(ctx context.Context, sourcePath string, getDependenciesCache *GetDependenciesCache) (*AtlantisProject, error) {
 	options, err := options.NewTerragruntOptionsWithConfigPath(sourcePath)
 	if err != nil {
 		return nil, err
@@ -330,7 +329,7 @@ func createProject(ctx context.Context, sourcePath string) (*AtlantisProject, er
 	options.Env = getEnvs()
 
 	parsingContext := config.NewParsingContext(ctx, options)
-	dependencies, err := getDependencies(parsingContext, sourcePath)
+	dependencies, err := getDependencies(parsingContext, sourcePath, getDependenciesCache)
 	if err != nil {
 		return nil, err
 	}
@@ -436,7 +435,7 @@ func createProject(ctx context.Context, sourcePath string) (*AtlantisProject, er
 	return project, nil
 }
 
-func createHclProject(ctx context.Context, sourcePaths []string, workingDir string, projectHcl string) (*AtlantisProject, error) {
+func createHclProject(ctx context.Context, sourcePaths []string, workingDir string, projectHcl string, getDependenciesCache *GetDependenciesCache) (*AtlantisProject, error) {
 	var projectHclDependencies []string
 	var childDependencies []string
 	workflow := defaultWorkflow
@@ -508,7 +507,7 @@ func createHclProject(ctx context.Context, sourcePaths []string, workingDir stri
 		}
 		opt.Env = getEnvs()
 		parsingContext := config.NewParsingContext(ctx, opt)
-		dependencies, err := getDependencies(parsingContext, sourcePath)
+		dependencies, err := getDependencies(parsingContext, sourcePath, getDependenciesCache)
 		if err != nil {
 			return nil, err
 		}
@@ -703,7 +702,7 @@ func getAllTerragruntProjectHclFiles() map[string][]string {
 	return uniqueHclFileAbsPaths
 }
 
-func main(cmd *cobra.Command, args []string) error {
+func runGenerate(getDependenciesCache *GetDependenciesCache) error {
 	// Ensure the gitRoot has a trailing slash and is an absolute path
 	absoluteGitRoot, err := filepath.Abs(gitRoot)
 	if err != nil {
@@ -779,7 +778,7 @@ func main(cmd *cobra.Command, args []string) error {
 
 				errGroup.Go(func() error {
 					defer sem.Release(1)
-					project, err := createProject(ctx, terragruntPath)
+					project, err := createProject(ctx, terragruntPath, getDependenciesCache)
 					if err != nil {
 						return err
 					}
@@ -836,7 +835,7 @@ func main(cmd *cobra.Command, args []string) error {
 
 			errGroup.Go(func() error {
 				defer sem.Release(1)
-				project, err := createHclProject(ctx, terragruntFiles, workingDir, projectHcl)
+				project, err := createHclProject(ctx, terragruntFiles, workingDir, projectHcl, getDependenciesCache)
 				if err != nil {
 					return err
 				}
@@ -979,60 +978,97 @@ var executionOrderGroups bool
 var dependsOn bool
 var stripDotTerragruntStackName bool
 
-// generateCmd represents the generate command
-var generateCmd = &cobra.Command{
-	Use:   "generate",
-	Short: "Makes atlantis config",
-	Long:  `Logs Yaml representing Atlantis config to stderr`,
-	// Test is needed to confirm that if --depends on is set, --create-project-name is also set.
-	PreRun: func(cmd *cobra.Command, args []string) {
-		dependsOn, _ := cmd.Flags().GetBool("depends-on")
-		if dependsOn {
-			cmd.MarkFlagRequired("create-project-name")
-		}
-	},
-	RunE: main,
-}
+// Resets all flag values to their defaults in between tests
+func resetForRun() error {
+	pwd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
 
-func init() {
-	rootCmd.AddCommand(generateCmd)
+	requestGroup = singleflight.Group{}
+	// reset flags
+	gitRoot = pwd
+	autoPlan = false
+	autoMerge = false
+	cascadeDependencies = true
+	ignoreParentTerragrunt = true
+	ignoreDependencyBlocks = false
+	parallel = true
+	createWorkspace = false
+	createProjectName = false
+	preserveWorkflows = true
+	preserveProjects = true
+	defaultWorkflow = ""
+	filterPaths = []string{}
+	outputPath = ""
+	defaultTerraformVersion = ""
+	defaultApplyRequirements = []string{}
+	projectHclFiles = []string{}
+	createHclProjectChilds = false
+	createHclProjectExternalChilds = true
+	useProjectMarkers = false
+	executionOrderGroups = false
+	dependsOn = false
+
+	return nil
+}
+func New() *cobra.Command {
+	getDependenciesCache := newGetDependenciesCache()
+
+	// For now bind the reset as part of function init to avoid refactoring the module.
+	// Should be replaced with a cleaner struct Options instead which is explicitly referenced.
+	if err := resetForRun(); err != nil {
+		fmt.Printf("Failed to reset default flags. %v", err)
+		os.Exit(2)
+	}
+
+	// cmd represents the generate command
+	var cmd = &cobra.Command{
+		Use:   "generate",
+		Short: "Makes atlantis config",
+		Long:  `Logs Yaml representing Atlantis config to stderr`,
+		// Test is needed to confirm that if --depends on is set, --create-project-name is also set.
+		PreRun: func(cmd *cobra.Command, args []string) {
+			dependsOnFlag, _ := cmd.Flags().GetBool("depends-on")
+			if dependsOnFlag {
+				_ = cmd.MarkFlagRequired("create-project-name")
+			}
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runGenerate(getDependenciesCache)
+		},
+	}
 
 	pwd, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	generateCmd.PersistentFlags().BoolVar(&autoPlan, "autoplan", false, "Enable auto plan. Default is disabled")
-	generateCmd.PersistentFlags().BoolVar(&autoMerge, "automerge", false, "Enable auto merge. Default is disabled")
-	generateCmd.PersistentFlags().BoolVar(&ignoreParentTerragrunt, "ignore-parent-terragrunt", true, "Ignore parent terragrunt configs (those which don't reference a terraform module). Default is enabled")
-	generateCmd.PersistentFlags().BoolVar(&createParentProject, "create-parent-project", false, "Create a project for the parent terragrunt configs (those which don't reference a terraform module). Default is disabled")
-	generateCmd.PersistentFlags().BoolVar(&ignoreDependencyBlocks, "ignore-dependency-blocks", false, "When true, dependencies found in `dependency` blocks will be ignored")
-	generateCmd.PersistentFlags().BoolVar(&parallel, "parallel", true, "Enables plans and applys to happen in parallel. Default is enabled")
-	generateCmd.PersistentFlags().BoolVar(&createWorkspace, "create-workspace", false, "Use different workspace for each project. Default is use default workspace")
-	generateCmd.PersistentFlags().BoolVar(&createProjectName, "create-project-name", false, "Add different name for each project. Default is false")
-	generateCmd.PersistentFlags().BoolVar(&preserveWorkflows, "preserve-workflows", true, "Preserves workflows from old output files. Default is true")
-	generateCmd.PersistentFlags().BoolVar(&preserveProjects, "preserve-projects", false, "Preserves projects from old output files to enable incremental builds. Default is false")
-	generateCmd.PersistentFlags().BoolVar(&cascadeDependencies, "cascade-dependencies", true, "When true, dependencies will cascade, meaning that a module will be declared to depend not only on its dependencies, but all dependencies of its dependencies all the way down. Default is true")
-	generateCmd.PersistentFlags().StringVar(&defaultWorkflow, "workflow", "", "Name of the workflow to be customized in the atlantis server. Default is to not set")
-	generateCmd.PersistentFlags().StringSliceVar(&defaultApplyRequirements, "apply-requirements", []string{}, "Requirements that must be satisfied before `atlantis apply` can be run. Currently the only supported requirements are `approved` and `mergeable`. Can be overridden by locals")
-	generateCmd.PersistentFlags().StringVar(&outputPath, "output", "", "Path of the file where configuration will be generated. Default is not to write to file")
-	generateCmd.PersistentFlags().StringSliceVar(&filterPaths, "filter", []string{}, "Comma-separated paths or glob expressions to the directories you want scope down the config for. Default is all files in root.")
-	generateCmd.PersistentFlags().StringVar(&gitRoot, "root", pwd, "Path to the root directory of the git repo you want to build config for. Default is current dir")
-	generateCmd.PersistentFlags().StringVar(&defaultTerraformVersion, "terraform-version", "", "Default terraform version to specify for all modules. Can be overriden by locals")
-	generateCmd.PersistentFlags().Int64Var(&numExecutors, "num-executors", 15, "Number of executors used for parallel generation of projects. Default is 15")
-	generateCmd.PersistentFlags().StringSliceVar(&projectHclFiles, "project-hcl-files", []string{}, "Comma-separated names of arbitrary hcl files in the terragrunt hierarchy to create Atlantis projects for. Disables the --filter flag")
-	generateCmd.PersistentFlags().BoolVar(&createHclProjectChilds, "create-hcl-project-childs", false, "Creates Atlantis projects for terragrunt child modules below the directories containing the HCL files defined in --project-hcl-files")
-	generateCmd.PersistentFlags().BoolVar(&createHclProjectExternalChilds, "create-hcl-project-external-childs", true, "Creates Atlantis projects for terragrunt child modules outside the directories containing the HCL files defined in --project-hcl-files")
-	generateCmd.PersistentFlags().BoolVar(&useProjectMarkers, "use-project-markers", false, "Creates Atlantis projects only for project hcl files with locals: atlantis_project = true")
-	generateCmd.PersistentFlags().BoolVar(&executionOrderGroups, "execution-order-groups", false, "Computes execution_order_groups for projects")
-	generateCmd.PersistentFlags().BoolVar(&dependsOn, "depends-on", false, "Computes depends_on for projects. Requires --create-project-name.")
-	generateCmd.PersistentFlags().BoolVar(&stripDotTerragruntStackName, "strip-dot-terragrunt-stack-name", false, "Remove the _terragrunt-stack directory names from project names.")
-}
+	cmd.PersistentFlags().BoolVar(&autoPlan, "autoplan", false, "Enable auto plan. Default is disabled")
+	cmd.PersistentFlags().BoolVar(&autoMerge, "automerge", false, "Enable auto merge. Default is disabled")
+	cmd.PersistentFlags().BoolVar(&ignoreParentTerragrunt, "ignore-parent-terragrunt", true, "Ignore parent terragrunt configs (those which don't reference a terraform module). Default is enabled")
+	cmd.PersistentFlags().BoolVar(&createParentProject, "create-parent-project", false, "Create a project for the parent terragrunt configs (those which don't reference a terraform module). Default is disabled")
+	cmd.PersistentFlags().BoolVar(&ignoreDependencyBlocks, "ignore-dependency-blocks", false, "When true, dependencies found in `dependency` blocks will be ignored")
+	cmd.PersistentFlags().BoolVar(&parallel, "parallel", true, "Enables plans and applys to happen in parallel. Default is enabled")
+	cmd.PersistentFlags().BoolVar(&createWorkspace, "create-workspace", false, "Use different workspace for each project. Default is use default workspace")
+	cmd.PersistentFlags().BoolVar(&createProjectName, "create-project-name", false, "Add different name for each project. Default is false")
+	cmd.PersistentFlags().BoolVar(&preserveWorkflows, "preserve-workflows", true, "Preserves workflows from old output files. Default is true")
+	cmd.PersistentFlags().BoolVar(&preserveProjects, "preserve-projects", false, "Preserves projects from old output files to enable incremental builds. Default is false")
+	cmd.PersistentFlags().BoolVar(&cascadeDependencies, "cascade-dependencies", true, "When true, dependencies will cascade, meaning that a module will be declared to depend not only on its dependencies, but all dependencies of its dependencies all the way down. Default is true")
+	cmd.PersistentFlags().StringVar(&defaultWorkflow, "workflow", "", "Name of the workflow to be customized in the atlantis server. Default is to not set")
+	cmd.PersistentFlags().StringSliceVar(&defaultApplyRequirements, "apply-requirements", []string{}, "Requirements that must be satisfied before `atlantis apply` can be run. Currently the only supported requirements are `approved` and `mergeable`. Can be overridden by locals")
+	cmd.PersistentFlags().StringVar(&outputPath, "output", "", "Path of the file where configuration will be generated. Default is not to write to file")
+	cmd.PersistentFlags().StringSliceVar(&filterPaths, "filter", []string{}, "Comma-separated paths or glob expressions to the directories you want scope down the config for. Default is all files in root.")
+	cmd.PersistentFlags().StringVar(&gitRoot, "root", pwd, "Path to the root directory of the git repo you want to build config for. Default is current dir")
+	cmd.PersistentFlags().StringVar(&defaultTerraformVersion, "terraform-version", "", "Default terraform version to specify for all modules. Can be overriden by locals")
+	cmd.PersistentFlags().Int64Var(&numExecutors, "num-executors", 15, "Number of executors used for parallel generation of projects. Default is 15")
+	cmd.PersistentFlags().StringSliceVar(&projectHclFiles, "project-hcl-files", []string{}, "Comma-separated names of arbitrary hcl files in the terragrunt hierarchy to create Atlantis projects for. Disables the --filter flag")
+	cmd.PersistentFlags().BoolVar(&createHclProjectChilds, "create-hcl-project-childs", false, "Creates Atlantis projects for terragrunt child modules below the directories containing the HCL files defined in --project-hcl-files")
+	cmd.PersistentFlags().BoolVar(&createHclProjectExternalChilds, "create-hcl-project-external-childs", true, "Creates Atlantis projects for terragrunt child modules outside the directories containing the HCL files defined in --project-hcl-files")
+	cmd.PersistentFlags().BoolVar(&useProjectMarkers, "use-project-markers", false, "Creates Atlantis projects only for project hcl files with locals: atlantis_project = true")
+	cmd.PersistentFlags().BoolVar(&executionOrderGroups, "execution-order-groups", false, "Computes execution_order_groups for projects")
+	cmd.PersistentFlags().BoolVar(&dependsOn, "depends-on", false, "Computes depends_on for projects. Requires --create-project-name.")
+	cmd.PersistentFlags().BoolVar(&stripDotTerragruntStackName, "strip-dot-terragrunt-stack-name", false, "Remove the _terragrunt-stack directory names from project names.")
 
-// Runs a set of arguments, returning the output
-func RunWithFlags(filename string, args []string) ([]byte, error) {
-	rootCmd.SetArgs(args)
-	rootCmd.Execute()
-
-	return os.ReadFile(filename)
+	return cmd
 }
