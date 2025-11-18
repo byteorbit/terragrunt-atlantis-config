@@ -5,7 +5,7 @@ FILE_ARCH=$(shell go env GOOS)_$(shell go env GOARCH)
 
 # Determine the arch/os combos we're building for
 XC_ARCH=amd64 arm64
-XC_OS=linux darwin windows
+XC_OS=linux darwin
 
 .PHONY: clean
 clean:
