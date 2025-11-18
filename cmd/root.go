@@ -5,6 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/transcend-io/terragrunt-atlantis-config/cmd/diff"
+	"github.com/transcend-io/terragrunt-atlantis-config/cmd/generate"
+	"github.com/transcend-io/terragrunt-atlantis-config/cmd/version"
 )
 
 var (
@@ -20,8 +22,8 @@ func NewRoot() *cobra.Command {
 		SilenceUsage: true,
 	}
 	rootCmd.AddCommand(
-		New(),
-		NewVersionCmd(rootCmd),
+		generate.New(),
+		version.New(rootCmd, VERSION),
 		diff.New(),
 	)
 	return rootCmd
