@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/transcend-io/terragrunt-atlantis-config/cmd/diff"
 )
 
 var (
@@ -21,6 +22,7 @@ func NewRoot() *cobra.Command {
 	rootCmd.AddCommand(
 		New(),
 		NewVersionCmd(rootCmd),
+		diff.New(),
 	)
 	return rootCmd
 }

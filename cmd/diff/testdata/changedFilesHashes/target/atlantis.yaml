@@ -1,0 +1,13 @@
+automerge: false
+parallel_apply: true
+parallel_plan: true
+projects:
+- autoplan:
+    enabled: true
+    when_modified:
+    - '*.hcl'
+    - '*.tf*'
+  dir: service
+  execution_order_group: 0
+  name: service
+version: 3

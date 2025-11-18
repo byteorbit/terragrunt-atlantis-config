@@ -1,0 +1,12 @@
+version: 3
+projects:
+- name: service
+  dir: service
+  autoplan:
+    when_modified:
+    - .atlantis-project-changed
+    enabled: true
+  execution_order_group: 0
+automerge: false
+parallel_apply: true
+parallel_plan: true
