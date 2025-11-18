@@ -4,7 +4,6 @@
 .vscode/
 *.code-workspace
 build
-test_artifacts
 
 # IDEs
 .vscode

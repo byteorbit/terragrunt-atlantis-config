@@ -1,5 +1,5 @@
 name: Build and test code
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   run-tests:
@@ -20,5 +20,4 @@ jobs:
           key: ${{ matrix.os }}-${{ matrix.golang-version }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ matrix.os }}-${{ matrix.golang-version }}-go-
-      - run: mkdir cmd/test_artifacts
       - run: go test -v -cover ./...

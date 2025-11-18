@@ -1,0 +1,2 @@
+Version changes should trigger a change, even when the resources did not change. This is to ensure the planner is
+more cautious about missing changes versus overly relying on the reference crawler accuracy.

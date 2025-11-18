@@ -1,0 +1,10 @@
+version: 3
+projects:
+- name: service
+  dir: service
+  autoplan:
+    enabled: false
+  execution_order_group: 0
+automerge: false
+parallel_apply: true
+parallel_plan: true

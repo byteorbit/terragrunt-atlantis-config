@@ -42,15 +42,11 @@ build-all: clean
 
 .PHONY: gotestsum
 gotestsum:
-	mkdir -p cmd/test_artifacts
 	gotestsum
-	rm -rf cmd/test_artifacts
 
 .PHONY: test
 test:
-	mkdir -p cmd/test_artifacts
 	go test -v ./...
-	rm -rf cmd/test_artifacts
 
 .PHONY: version
 version:
