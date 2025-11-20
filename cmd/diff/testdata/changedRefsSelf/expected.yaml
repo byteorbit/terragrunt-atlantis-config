@@ -5,7 +5,7 @@ projects:
 - autoplan:
     enabled: true
     when_modified:
-    - '.atlantis-project-changed'
+    - '../../**/*'
   dir: .terragrunt-stack/service
   execution_order_group: 0
   name: _terragrunt-stack_service

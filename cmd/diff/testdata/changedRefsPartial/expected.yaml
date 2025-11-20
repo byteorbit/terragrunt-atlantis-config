@@ -10,14 +10,14 @@ projects:
 - autoplan:
     enabled: true
     when_modified:
-    - '.atlantis-project-changed'
+    - '../../**/*'
   dir: .terragrunt-stack/parent
   execution_order_group: 0
   name: _terragrunt-stack_parent
 - autoplan:
     enabled: true
     when_modified:
-    - '.atlantis-project-changed'
+    - '../../**/*'
   depends_on:
   - _terragrunt-stack_parent
   dir: .terragrunt-stack/child

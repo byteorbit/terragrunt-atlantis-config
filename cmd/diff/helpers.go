@@ -4,6 +4,8 @@ import (
 	"errors"
 	"io"
 	"os"
+	"path"
+	"strings"
 
 	"github.com/runatlantis/atlantis/server/core/config/raw"
 	log "github.com/sirupsen/logrus"
@@ -40,4 +42,20 @@ func LoadRawRepoCfg(filename string) (*raw.RepoCfg, error) {
 		return nil, err
 	}
 	return rawCfg, nil
+}
+
+func WhenModifiedGlobFromDir(dir string) string {
+	clean := strings.TrimSpace(dir)
+	if clean == "" {
+		return "**/*"
+	}
+
+	clean = path.Clean(clean)
+	if clean == "." {
+		return "**/*"
+	}
+
+	segments := strings.Split(clean, "/")
+	depth := len(segments)
+	return strings.Repeat("../", depth) + "**/*"
 }

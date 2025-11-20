@@ -68,10 +68,11 @@ func CreateComparison(opts *Options) error {
 			if err != nil {
 				return err
 			}
-			p.Autoplan.Enabled = &changed // TODO determine if this should always be true
+			p.Autoplan.Enabled = &changed
 			if changed {
+				whenModified := WhenModifiedGlobFromDir(*p.Dir)
 				p.Autoplan.WhenModified = []string{
-					".atlantis-project-changed",
+					whenModified,
 				}
 			} else {
 				p.Autoplan.WhenModified = []string{}
