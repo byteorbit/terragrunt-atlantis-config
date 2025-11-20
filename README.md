@@ -48,7 +48,7 @@ Then, make sure `terragrunt-atlantis-config` is present on your Atlantis server.
 
 ```hcl
 variable "terragrunt_atlantis_config_version" {
-  default = "1.22.0-BO"
+  default = "1.23.0-BO"
 }
 
 build {
@@ -192,7 +192,7 @@ You can install this tool locally to checkout what kinds of config it will gener
 Recommended: Install any version via go install:
 
 ```bash
-go install github.com/byteorbit/terragrunt-atlantis-config@v1.22.0-BO
+go install github.com/byteorbit/terragrunt-atlantis-config@v1.23.0-BO
 ```
 
 This module officially supports golang version v1.23, tested on Github with each build. 
