@@ -42,9 +42,10 @@ jobs:
           find "$BUILD_DIR" -type f -exec sha512sum {} + | awk -v build_dir="$BUILD_DIR" '{sub("^"build_dir"/", ""); print $1, $2}' > SHA512SUMS
 
       # Create the release
-      - uses: "marvinpinto/action-automatic-releases@d68defdd11f9dcc7f52f35c1b7c236ee7513bcc1"
+      - name: GH Release
+        uses: softprops/action-gh-release@v2.4.2
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
           files: |
             build/${{ steps.get_version.outputs.VERSION }}/*
