@@ -8,6 +8,6 @@ import "github.com/transcend-io/terragrunt-atlantis-config/cmd"
 var VERSION string = "1.23.0-BO"
 
 func main() {
-	rootCmd := cmd.NewRoot()
-	cmd.Execute(rootCmd, VERSION)
+	rootCmd := cmd.NewRoot(VERSION)
+	cmd.Execute(rootCmd)
 }

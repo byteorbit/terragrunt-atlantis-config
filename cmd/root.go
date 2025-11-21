@@ -9,11 +9,7 @@ import (
 	"github.com/transcend-io/terragrunt-atlantis-config/cmd/version"
 )
 
-var (
-	VERSION string
-)
-
-func NewRoot() *cobra.Command {
+func NewRoot(_version string) *cobra.Command {
 	// rootCmd represents the base command when called without any subcommands
 	var rootCmd = &cobra.Command{
 		Use:          "terragrunt-atlantis-config",
@@ -23,7 +19,7 @@ func NewRoot() *cobra.Command {
 	}
 	rootCmd.AddCommand(
 		generate.New(),
-		version.New(rootCmd, VERSION),
+		version.New(rootCmd, _version),
 		diff.New(),
 	)
 	return rootCmd
@@ -31,8 +27,7 @@ func NewRoot() *cobra.Command {
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute(rootCmd *cobra.Command, version string) {
-	VERSION = version
+func Execute(rootCmd *cobra.Command) {
 
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
