@@ -178,7 +178,7 @@ func getDependencies(ctx *config.ParsingContext, path string, getDependenciesCac
 		// Get deps from `dependencies` and `dependency` blocks
 		if parsedConfig.Dependencies != nil && !ignoreDependencyBlocks {
 			for _, parsedPaths := range parsedConfig.Dependencies.Paths {
-				dependencies = append(dependencies, filepath.Join(parsedPaths, "terragrunt.hcl"))
+				dependencies = append(dependencies, filepath.Join(parsedPaths, "*.hcl"), filepath.Join(parsedPaths, "*.tf"))
 			}
 		}
 

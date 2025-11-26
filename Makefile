@@ -63,3 +63,7 @@ sign:  build-all
 install:
 	install -d -m 755 '$(HOME)/.local/bin/'
 	install $(PATH_BUILD)$(VERSION)/$(FILE_COMMAND)_$(VERSION)_$(FILE_ARCH) '$(HOME)/.local/bin/$(FILE_COMMAND)'
+
+.PHONY: reset_test_data
+reset_test_data:
+	./cmd/diff/scripts/reset_test_data.sh
