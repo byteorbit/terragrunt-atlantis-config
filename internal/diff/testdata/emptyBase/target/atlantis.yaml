@@ -8,6 +8,7 @@ projects:
     - '*.hcl'
     - '*.tf*'
     - ../../root.hcl
+    - ../../../../../../../test_extras/catalog/modules/service/*.tf*
   dir: .terragrunt-stack/service
   execution_order_group: 0
   name: _terragrunt-stack_service

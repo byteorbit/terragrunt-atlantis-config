@@ -8,7 +8,7 @@ include "root" {
 }
 
 terraform {
-  source = "."
+  source = find_in_parent_folders("test_extras/catalog/modules/service")
 }
 
 inputs = {

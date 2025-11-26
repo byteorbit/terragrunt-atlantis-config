@@ -66,4 +66,5 @@ install:
 
 .PHONY: reset_test_data
 reset_test_data:
-	./cmd/diff/scripts/reset_test_data.sh
+	./scripts/diff/reset_test_data.sh
+	./scripts/generate/reset_test_data.sh
