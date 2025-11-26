@@ -5,11 +5,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/transcend-io/terragrunt-atlantis-config/cmd/diff"
+	diff2 "github.com/transcend-io/terragrunt-atlantis-config/internal/diff"
 )
 
 func runWithFlags(args []string) error {
-	diffCmd := diff.New()
+	diffCmd := diff2.New()
 	diffCmd.SetArgs(args)
 	if err := diffCmd.Execute(); err != nil {
 		return err
@@ -52,11 +52,11 @@ func runBasicDiffTestWithDirs(t *testing.T, testDir, _baseDir, _targetDir string
 		t.Fatalf("Failed run diff")
 	}
 
-	expectedContent, err := diff.LoadRawRepoCfg(filepath.Join("testdata", testDir, expectedYaml))
+	expectedContent, err := diff2.LoadRawRepoCfg(filepath.Join("testdata", testDir, expectedYaml))
 	if err != nil {
 		t.Fatal(err)
 	}
-	actualContent, err := diff.LoadRawRepoCfg(outputYaml)
+	actualContent, err := diff2.LoadRawRepoCfg(outputYaml)
 	if err != nil {
 		t.Fatal(err)
 	}
