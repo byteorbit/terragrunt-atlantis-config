@@ -1,6 +1,10 @@
 package main
 
-import "github.com/transcend-io/terragrunt-atlantis-config/cmd"
+import (
+	"os"
+
+	"github.com/transcend-io/terragrunt-atlantis-config/internal/root"
+)
 
 // This variable is set at build time using -ldflags parameters.
 // But we still set a default here for those using plain `go get` downloads
@@ -8,6 +12,8 @@ import "github.com/transcend-io/terragrunt-atlantis-config/cmd"
 var VERSION string = "1.23.1-BO"
 
 func main() {
-	rootCmd := cmd.NewRoot(VERSION)
-	cmd.Execute(rootCmd)
+	rootCmd := root.New(VERSION)
+	if err := rootCmd.Execute(); err != nil {
+		os.Exit(1)
+	}
 }

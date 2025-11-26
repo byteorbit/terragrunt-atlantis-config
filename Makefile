@@ -20,7 +20,8 @@ build: clean
 	-mod=readonly \
 	-modcacherw \
 	-ldflags "-X main.VERSION=$(VERSION)" \
-	-o $(PATH_BUILD)$(VERSION)/$(FILE_COMMAND)_$(VERSION)_$(FILE_ARCH)
+	-o $(PATH_BUILD)$(VERSION)/$(FILE_COMMAND)_$(VERSION)_$(FILE_ARCH) \
+	./cmd/root
 
 .PHONY: build-all
 build-all: clean
@@ -36,7 +37,8 @@ build-all: clean
 			-mod=readonly \
 			-modcacherw \
 			-ldflags "-X main.VERSION=$(VERSION)" \
-			-o $(PATH_BUILD)$(VERSION)/$(FILE_COMMAND)_$(VERSION)_$${os}_$${arch}$${ext} ; \
+			-o $(PATH_BUILD)$(VERSION)/$(FILE_COMMAND)_$(VERSION)_$${os}_$${arch}$${ext} \
+			./cmd/root ; \
 		done \
 	done
 
