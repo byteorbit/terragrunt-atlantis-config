@@ -799,6 +799,7 @@ projects:
     - '*.tf*'
     - ../../../root.hcl
     - ../parent/terragrunt.hcl
+    - ../parent/terragrunt.values.hcl
     - "../../../../../../../../test_extras/catalog/modules/service/*.tf*"
   dir: terragrunt_stack/internal-dependency/prod/.terragrunt-stack/child
 - autoplan:

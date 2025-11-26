@@ -8,7 +8,7 @@ projects:
     - '*.hcl'
     - '*.tf*'
     - ../../root.hcl
-    - ../../../../../../../test_extras/catalog/modules/versioned/v2/*.tf*
+    - ../../../../../../../test_extras/catalog/modules/versioned/v1/*.tf*
   dir: .terragrunt-stack/ancestor
   execution_order_group: 0
   name: _terragrunt-stack_ancestor
@@ -20,25 +20,39 @@ projects:
     - ../../root.hcl
     - ../ancestor/terragrunt.hcl
     - ../ancestor/terragrunt.values.hcl
-    - ../../../../../../../test_extras/catalog/modules/versioned/v2/*.tf*
+    - ../../../../../../../test_extras/catalog/modules/versioned/v1/*.tf*
   depends_on:
   - _terragrunt-stack_ancestor
-  dir: .terragrunt-stack/parent
+  dir: .terragrunt-stack/parent1
   execution_order_group: 1
-  name: _terragrunt-stack_parent
+  name: _terragrunt-stack_parent1
 - autoplan:
     enabled: true
     when_modified:
     - '*.hcl'
     - '*.tf*'
     - ../../root.hcl
-    - ../parent/terragrunt.hcl
-    - ../parent/terragrunt.values.hcl
     - ../ancestor/terragrunt.hcl
     - ../ancestor/terragrunt.values.hcl
-    - ../../../../../../../test_extras/catalog/modules/versioned/v2/*.tf*
+    - ../../../../../../../test_extras/catalog/modules/versioned/v1/*.tf*
   depends_on:
-  - _terragrunt-stack_parent
+  - _terragrunt-stack_ancestor
+  dir: .terragrunt-stack/parent2
+  execution_order_group: 1
+  name: _terragrunt-stack_parent2
+- autoplan:
+    enabled: true
+    when_modified:
+    - '*.hcl'
+    - '*.tf*'
+    - ../../root.hcl
+    - ../parent1/terragrunt.hcl
+    - ../parent1/terragrunt.values.hcl
+    - ../ancestor/terragrunt.hcl
+    - ../ancestor/terragrunt.values.hcl
+    - ../../../../../../../test_extras/catalog/modules/versioned/v1/*.tf*
+  depends_on:
+  - _terragrunt-stack_parent1
   - _terragrunt-stack_ancestor
   dir: .terragrunt-stack/child
   execution_order_group: 2

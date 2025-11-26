@@ -3,6 +3,13 @@ atlantis.yaml generated for projects using:
 ```shell
 terragrunt-atlantis-config generate --output atlantis.yaml --autoplan --parallel  --execution-order-groups --create-project-name --depends-on
 ```
+> NOTE ON THE TESTDATA
+> To ensure the diff commands unit tests are not coupled to terragrunt and the generate command, testdata is pre rendered.
+> Generating stacks and creating atlantis files from scratch is out of scope of this command.
+> This ensures very fast unit tests. Normally these assets would be inlined in the go test files, this reduces legibility of the go files.
+
+The `cmd/diff/scripts/reset_test_data.sh` script should be executed if any project changes are made, to ensure the tests
+accurately reflect changes.
 
 ## Test scenarios:
 

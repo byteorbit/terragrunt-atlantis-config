@@ -64,7 +64,7 @@ install:
 	install -d -m 755 '$(HOME)/.local/bin/'
 	install $(PATH_BUILD)$(VERSION)/$(FILE_COMMAND)_$(VERSION)_$(FILE_ARCH) '$(HOME)/.local/bin/$(FILE_COMMAND)'
 
-.PHONY: reset_test_data
-reset_test_data:
+.PHONY: reset-test-data
+reset-test-data:
 	./scripts/diff/reset_test_data.sh
 	./scripts/generate/reset_test_data.sh

@@ -99,3 +99,7 @@ func TestChangesRefsDeep(t *testing.T) {
 func TestChangesRefsPartial(t *testing.T) {
 	runBasicDiffTest(t, "changedRefsPartial")
 }
+
+func TestMultiDependenciesSingleChange(t *testing.T) {
+	runBasicDiffTest(t, "multiDependenciesSingleChange")
+}

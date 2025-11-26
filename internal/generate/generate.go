@@ -239,14 +239,16 @@ func getDependencies(ctx *config.ParsingContext, path string, getDependenciesCac
 		// Filter out and dependencies that are the empty string
 		nonEmptyDeps := []string{}
 		for _, dep := range dependencies {
-			if dep != "" {
-				childDepAbsPath := dep
-				if !filepath.IsAbs(childDepAbsPath) {
-					childDepAbsPath = makePathAbsolute(dep, path)
-				}
-				childDepAbsPath = filepath.ToSlash(childDepAbsPath)
-				nonEmptyDeps = append(nonEmptyDeps, childDepAbsPath)
+			if dep == "" {
+				continue
 			}
+
+			childDepAbsPath := dep
+			if !filepath.IsAbs(childDepAbsPath) {
+				childDepAbsPath = makePathAbsolute(dep, path)
+			}
+			childDepAbsPath = filepath.ToSlash(childDepAbsPath)
+			nonEmptyDeps = append(nonEmptyDeps, childDepAbsPath)
 		}
 
 		// Recurse to find dependencies of all dependencies
@@ -369,6 +371,11 @@ func createProject(ctx context.Context, sourcePath string, getDependenciesCache 
 		}
 
 		relativeDependencies = append(relativeDependencies, filepath.ToSlash(relativePath))
+
+		// If this dependency is a terragrunt config, also track its sibling values file.
+		if filepath.Base(absolutePath) == "terragrunt.hcl" {
+			addTerragruntValuesDependency(&relativeDependencies, absoluteSourceDir, absolutePath)
+		}
 	}
 
 	// Clean up the relative path to the format Atlantis expects
@@ -539,6 +546,11 @@ func createHclProject(ctx context.Context, sourcePaths []string, workingDir stri
 
 			if !strings.Contains(absolutePath, filepath.ToSlash(workingDir)) {
 				relativeDependencies = append(relativeDependencies, filepath.ToSlash(relativePath))
+
+				// If this dependency is a terragrunt config, also track its sibling values file.
+				if filepath.Base(absolutePath) == "terragrunt.hcl" {
+					addTerragruntValuesDependency(&relativeDependencies, workingDir, absolutePath)
+				}
 			}
 		}
 
@@ -875,8 +887,9 @@ func runGenerate(getDependenciesCache *GetDependenciesCache) error {
 			hasChanges = false
 			for _, project := range config.Projects {
 				executionOrderGroup := 0
-				//seen := make(map[string]bool)
 				dependsOnList := []string{}
+				seen := make(map[string]bool) // ensure each dependent project is listed once
+
 				// choose order group based on dependencies
 				for _, dep := range project.Autoplan.WhenModified {
 					depPath := filepath.ToSlash(filepath.Dir(filepath.Join(project.Dir, dep)))
@@ -887,7 +900,7 @@ func runGenerate(getDependenciesCache *GetDependenciesCache) error {
 
 					depProject, ok := projectsMap[depPath]
 					if !ok {
-						// skip not project dependencies
+						// skip non-project dependencies
 						continue
 					}
 					if depProject.ExecutionOrderGroup != nil {
@@ -895,11 +908,17 @@ func runGenerate(getDependenciesCache *GetDependenciesCache) error {
 							executionOrderGroup = *depProject.ExecutionOrderGroup + 1
 						}
 					}
-					//projName := depProject.Name
-					//if _, ok := seen[projName]; !ok {
-					//	seen[projName] = true
-					dependsOnList = append(dependsOnList, depProject.Name)
-					//}
+
+					// Deduplicate depends_on entries at the project level
+					projName := depProject.Name
+					// depends-on requires --create-project-name, so projName should be set.
+					if projName == "" {
+						continue
+					}
+					if !seen[projName] {
+						seen[projName] = true
+						dependsOnList = append(dependsOnList, projName)
+					}
 				}
 				if projectsMap[project.Dir].ExecutionOrderGroup == nil || *projectsMap[project.Dir].ExecutionOrderGroup != executionOrderGroup {
 					if executionOrderGroups {

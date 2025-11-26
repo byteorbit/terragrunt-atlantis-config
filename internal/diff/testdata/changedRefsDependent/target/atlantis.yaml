@@ -19,6 +19,7 @@ projects:
     - '*.tf*'
     - ../../root.hcl
     - ../parent/terragrunt.hcl
+    - ../parent/terragrunt.values.hcl
     - ../../../../../../../test_extras/catalog/modules/versioned/v2/*.tf*
   depends_on:
   - _terragrunt-stack_parent

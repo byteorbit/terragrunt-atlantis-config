@@ -19,6 +19,7 @@ projects:
     - '*.tf*'
     - ../../root.hcl
     - ../ancestor/terragrunt.hcl
+    - ../ancestor/terragrunt.values.hcl
     - ../../../../../../../test_extras/catalog/modules/versioned/v1/*.tf*
   depends_on:
   - _terragrunt-stack_ancestor
@@ -32,7 +33,9 @@ projects:
     - '*.tf*'
     - ../../root.hcl
     - ../parent/terragrunt.hcl
+    - ../parent/terragrunt.values.hcl
     - ../ancestor/terragrunt.hcl
+    - ../ancestor/terragrunt.values.hcl
     - ../../../../../../../test_extras/catalog/modules/versioned/v1/*.tf*
   depends_on:
   - _terragrunt-stack_parent
