@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/byteorbit/terragrunt-atlantis-config/internal/version"
 	"github.com/spf13/cobra"
-	"github.com/transcend-io/terragrunt-atlantis-config/internal/version"
 )
 
 func TestNewVersionCommand(t *testing.T) {

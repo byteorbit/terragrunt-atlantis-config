@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/transcend-io/terragrunt-atlantis-config/internal/root"
+	"github.com/byteorbit/terragrunt-atlantis-config/internal/root"
 )
 
 // This variable is set at build time using -ldflags parameters.

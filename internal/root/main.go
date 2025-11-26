@@ -1,10 +1,10 @@
 package root
 
 import (
+	"github.com/byteorbit/terragrunt-atlantis-config/internal/diff"
+	"github.com/byteorbit/terragrunt-atlantis-config/internal/generate"
+	"github.com/byteorbit/terragrunt-atlantis-config/internal/version"
 	"github.com/spf13/cobra"
-	"github.com/transcend-io/terragrunt-atlantis-config/internal/diff"
-	"github.com/transcend-io/terragrunt-atlantis-config/internal/generate"
-	"github.com/transcend-io/terragrunt-atlantis-config/internal/version"
 )
 
 func New(_version string) *cobra.Command {

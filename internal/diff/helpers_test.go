@@ -3,7 +3,7 @@ package diff_test
 import (
 	"testing"
 
-	"github.com/transcend-io/terragrunt-atlantis-config/internal/diff"
+	"github.com/byteorbit/terragrunt-atlantis-config/internal/diff"
 )
 
 func TestWhenModifiedPatternFromDir_Root(t *testing.T) {

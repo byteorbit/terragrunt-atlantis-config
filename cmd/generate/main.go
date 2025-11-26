@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/transcend-io/terragrunt-atlantis-config/internal/generate"
+	"github.com/byteorbit/terragrunt-atlantis-config/internal/generate"
 )
 
 func main() {

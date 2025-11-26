@@ -8,10 +8,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/byteorbit/terragrunt-atlantis-config/internal/generate"
 	"github.com/ghodss/yaml"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
-	"github.com/transcend-io/terragrunt-atlantis-config/internal/generate"
 )
 
 // Runs a set of arguments, returning the output
