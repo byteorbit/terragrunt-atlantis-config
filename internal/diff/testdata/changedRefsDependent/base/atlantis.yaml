@@ -1,0 +1,29 @@
+automerge: false
+parallel_apply: true
+parallel_plan: true
+projects:
+- autoplan:
+    enabled: true
+    when_modified:
+    - '*.hcl'
+    - '*.tf*'
+    - ../../root.hcl
+    - ../../../../../../../test_extras/catalog/modules/versioned/v1/*.tf*
+  dir: .terragrunt-stack/parent
+  execution_order_group: 0
+  name: _terragrunt-stack_parent
+- autoplan:
+    enabled: true
+    when_modified:
+    - '*.hcl'
+    - '*.tf*'
+    - ../../root.hcl
+    - ../parent/terragrunt.hcl
+    - ../parent/terragrunt.values.hcl
+    - ../../../../../../../test_extras/catalog/modules/versioned/v1/*.tf*
+  depends_on:
+  - _terragrunt-stack_parent
+  dir: .terragrunt-stack/child
+  execution_order_group: 1
+  name: _terragrunt-stack_child
+version: 3

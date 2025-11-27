@@ -1,4 +1,4 @@
-VERSION=1.23.1-BO
+VERSION=1.23.2-BO
 PATH_BUILD=build/
 FILE_COMMAND=terragrunt-atlantis-config
 FILE_ARCH=$(shell go env GOOS)_$(shell go env GOARCH)
@@ -20,7 +20,8 @@ build: clean
 	-mod=readonly \
 	-modcacherw \
 	-ldflags "-X main.VERSION=$(VERSION)" \
-	-o $(PATH_BUILD)$(VERSION)/$(FILE_COMMAND)_$(VERSION)_$(FILE_ARCH)
+	-o $(PATH_BUILD)$(VERSION)/$(FILE_COMMAND)_$(VERSION)_$(FILE_ARCH) \
+	./cmd/root
 
 .PHONY: build-all
 build-all: clean
@@ -36,7 +37,8 @@ build-all: clean
 			-mod=readonly \
 			-modcacherw \
 			-ldflags "-X main.VERSION=$(VERSION)" \
-			-o $(PATH_BUILD)$(VERSION)/$(FILE_COMMAND)_$(VERSION)_$${os}_$${arch}$${ext} ; \
+			-o $(PATH_BUILD)$(VERSION)/$(FILE_COMMAND)_$(VERSION)_$${os}_$${arch}$${ext} \
+			./cmd/root ; \
 		done \
 	done
 
@@ -61,3 +63,8 @@ sign:  build-all
 install:
 	install -d -m 755 '$(HOME)/.local/bin/'
 	install $(PATH_BUILD)$(VERSION)/$(FILE_COMMAND)_$(VERSION)_$(FILE_ARCH) '$(HOME)/.local/bin/$(FILE_COMMAND)'
+
+.PHONY: reset-test-data
+reset-test-data:
+	./scripts/diff/reset_test_data.sh
+	./scripts/generate/reset_test_data.sh

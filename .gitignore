@@ -38,3 +38,5 @@ build
 
 # Dependency directories (add a comment below to exclude it)
  vendor
+
+.terragrunt-stack-manifest

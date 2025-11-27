@@ -1,0 +1,36 @@
+automerge: false
+parallel_apply: true
+parallel_plan: true
+projects:
+- autoplan:
+    enabled: false
+  dir: .terragrunt-stack/ancestor
+  execution_order_group: 0
+  name: _terragrunt-stack_ancestor
+- autoplan:
+    enabled: true
+    when_modified:
+    - ../../**/*
+  depends_on:
+  - _terragrunt-stack_ancestor
+  dir: .terragrunt-stack/parent1
+  execution_order_group: 1
+  name: _terragrunt-stack_parent1
+- autoplan:
+    enabled: false
+  depends_on:
+  - _terragrunt-stack_ancestor
+  dir: .terragrunt-stack/parent2
+  execution_order_group: 1
+  name: _terragrunt-stack_parent2
+- autoplan:
+    enabled: true
+    when_modified:
+    - ../../**/*
+  depends_on:
+  - _terragrunt-stack_parent1
+  - _terragrunt-stack_ancestor
+  dir: .terragrunt-stack/child
+  execution_order_group: 2
+  name: _terragrunt-stack_child
+version: 3
