@@ -9,7 +9,7 @@ import (
 // This variable is set at build time using -ldflags parameters.
 // But we still set a default here for those using plain `go get` downloads
 // For more info, see: http://stackoverflow.com/a/11355611/483528
-var VERSION string = "1.23.1-BO"
+var VERSION string = "1.23.2-BO"
 
 func main() {
 	rootCmd := root.New(VERSION)
